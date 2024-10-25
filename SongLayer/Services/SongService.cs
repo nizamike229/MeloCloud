@@ -1,32 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+using Microsoft.EntityFrameworkCore;
 using MyMusicApp.Interfaces;
-using MyMusicApp.Model;
+using MyMusicApp.Models;
 
 namespace MyMusicApp.Services;
 
 public class SongService : ISongService
 {
     private readonly MusicDbContext _context;
+    private readonly HttpClient _httpClient;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public SongService(MusicDbContext context)
+    public SongService(MusicDbContext context, IHttpClientFactory httpClientFactory,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpClient = httpClientFactory.CreateClient("AuthClient");
+        _httpContextAccessor = httpContextAccessor;
+
+        var cookieContainer = new CookieContainer();
+        var handler = new HttpClientHandler { CookieContainer = cookieContainer };
+        _httpClient = new HttpClient(handler);
+
+        if (_httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue("access_token", out var token) == true)
+        {
+            cookieContainer.Add(new Uri("http://localhost:5151"), new Cookie("access_token", token));
+        }
     }
 
 
     public async Task AddSongAsync(SongCreateModel song)
     {
         if (!string.IsNullOrWhiteSpace(song.SongEncoded) && !string.IsNullOrWhiteSpace(song.CoverEncoded) &&
-            !string.IsNullOrWhiteSpace(song.Artists) && !string.IsNullOrWhiteSpace(song.Name))
+            !string.IsNullOrWhiteSpace(song.UserId) && !string.IsNullOrWhiteSpace(song.Name))
         {
-            string path = $@"./Songs/{song.Name}-{song.Artists}.mp3";
+            if (!Guid.TryParse(song.UserId, out _))
+                throw new Exception("Invalid UserId");
+
+            var path = $"./Songs/{song.Name}-{song.UserId}.mp3";
             File.Create(path).Close();
-            var bytes= Convert.FromBase64String(song.SongEncoded);
-            await File.WriteAllBytesAsync(path,bytes);
-            var songResult = new Song()
+            var bytes = Convert.FromBase64String(song.SongEncoded);
+            await File.WriteAllBytesAsync(path, bytes);
+            var songResult = new Song
             {
                 Name = song.Name,
-                Artists = song.Artists,
+                UserId = song.UserId,
                 CoverEncoded = song.CoverEncoded,
                 SongPath = path
             };
@@ -35,7 +53,7 @@ public class SongService : ISongService
         }
     }
 
-    public async Task<string> UpdateSongAsync(Song song)
+    public async Task<string> UpdateSongAsync(SongUpdateModel song)
     {
         var songToUpdate = await _context.Songs.FindAsync(song.Id);
 
@@ -43,16 +61,10 @@ public class SongService : ISongService
             throw new Exception("Song not found");
 
         if (!string.IsNullOrWhiteSpace(song.Name))
-            songToUpdate!.Name = song.Name;
-
-        if (!string.IsNullOrWhiteSpace(song.Artists))
-            songToUpdate!.Artists = song.Artists;
-
-        if (!string.IsNullOrWhiteSpace(song.SongPath))
-            songToUpdate!.SongPath = song.SongPath;
+            songToUpdate.Name = song.Name;
 
         if (!string.IsNullOrWhiteSpace(song.CoverEncoded))
-            songToUpdate!.CoverEncoded = song.CoverEncoded;
+            songToUpdate.CoverEncoded = song.CoverEncoded;
 
         await _context.SaveChangesAsync();
 
@@ -67,12 +79,17 @@ public class SongService : ISongService
 
     public async Task<List<Song>> GetSongsAsync()
     {
-        var result= await _context.Songs.ToListAsync();
+        var result = await _context.Songs.ToListAsync();
         foreach (var t in result)
         {
+            var response = await _httpClient.GetAsync($"http://localhost:5151/auth/getUsernameById?id={t.UserId}");
+            t.UserId = response.IsSuccessStatusCode
+                ? await response.Content.ReadAsStringAsync()
+                : "Unknown";
             var bytes = await File.ReadAllBytesAsync(t.SongPath);
             t.SongPath = Convert.ToBase64String(bytes);
         }
+
         return result;
     }
 
