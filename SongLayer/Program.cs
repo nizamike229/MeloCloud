@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MyMusicApp;
 using MyMusicApp.Interfaces;
+using MyMusicApp.Middleware;
 using MyMusicApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 services.AddDbContext<MusicDbContext>();
 services.AddTransient<ISongService, SongService>();
+services.AddHttpClient("AuthClient");
+services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
@@ -55,6 +58,8 @@ services.AddAuthentication(options =>
 services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandler>();
 
 if (app.Environment.IsDevelopment())
 {
