@@ -1,6 +1,7 @@
 using System.Text;
 using AuthLayer;
 using AuthLayer.Interfaces;
+using AuthLayer.Middleware;
 using AuthLayer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -56,6 +57,7 @@ services.AddAuthentication(options =>
 services.AddAuthorization();
 
 var app = builder.Build();
+app.UseMiddleware<ErrorHandler>();
 
 if (app.Environment.IsDevelopment())
 {
