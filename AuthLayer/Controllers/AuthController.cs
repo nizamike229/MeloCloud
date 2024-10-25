@@ -68,4 +68,13 @@ public class AuthController : ControllerBase
     {
         return Ok(await _authService.GetUsernameByIdAsync(id));
     }
+
+    [Authorize]
+    [HttpPost]
+    [ActionName("logOut")]
+    public ActionResult Logout()
+    {
+        Response.Cookies.Delete("access_token");
+        return Ok();
+    }
 }
