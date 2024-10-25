@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuthLayer.Controllers;
 
-
 [ApiController]
 [Route("[controller]/[action]")]
 public class AuthController : ControllerBase
@@ -32,25 +31,41 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<User>> LoginAsync([FromBody] UserLoginRequest request)
     {
         var user = await _authService.LoginAsync(request);
-        var token=_tokenService.GenerateJwtToken(user.Username,user.Id);
-        
-        Response.Cookies.Append("access_token",token,new CookieOptions
+        var token = _tokenService.GenerateJwtToken(user.Username, user.Id);
+
+        Response.Cookies.Append("access_token", token, new CookieOptions
         {
             HttpOnly = true,
             SameSite = SameSiteMode.None,
             Secure = true
         });
-        
+
         return Ok(user);
     }
 
     [Authorize]
     [HttpGet]
     [ActionName("personal")]
-    public ActionResult<string> Personal()
+    public async Task<ActionResult<UserResponse>> Personal()
     {
-        var username = User.FindFirstValue(ClaimTypes.Name);
-        
-        return "You are logged in as: " + username;
-    } 
+        return Ok(await _authService.GetPersonalInfoAsync(User.FindFirstValue(ClaimTypes.Sid)!));
+    }
+
+    [Authorize]
+    [HttpPatch]
+    [ActionName("edit")]
+    public async Task<ActionResult<string>> Edit(EditModel request)
+    {
+        request.Id=User.FindFirstValue(ClaimTypes.Sid)!;
+        await _authService.Edit(request);
+        return Ok("User edited successfully!");
+    }
+
+    [Authorize]
+    [HttpGet]
+    [ActionName("getUsernameById")]
+    public async Task<ActionResult<string>> GetUsernameById([FromQuery]string id)
+    {
+        return Ok(await _authService.GetUsernameByIdAsync(id));
+    }
 }
