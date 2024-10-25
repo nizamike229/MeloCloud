@@ -19,10 +19,10 @@ public class ErrorHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message, "Произошла ошибка при обработке запроса.");
+            _logger.LogError(ex.Message, "Error while processing request.");
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             context.Response.ContentType = "text/plain";
-            await context.Response.WriteAsync($"Произошла ошибка: {ex.Message}.");
+            await context.Response.WriteAsync($"Error while processing request: {ex.Message}.");
         }
     }
 }
