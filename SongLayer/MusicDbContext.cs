@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyMusicApp.Model;
+using MyMusicApp.Models;
 
 namespace MyMusicApp;
 
@@ -28,16 +28,16 @@ public partial class MusicDbContext : DbContext
             entity.ToTable("songs");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Artists)
+            entity.Property(e => e.UserId)
                 .HasMaxLength(150)
-                .HasColumnName("artists");
+                .HasColumnName("user_id");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
             entity.Property(e => e.SongPath)
                 .HasColumnType("character varying")
                 .HasColumnName("song_path");
-            entity.Property(e=>e.CoverEncoded)
+            entity.Property(e => e.CoverEncoded)
                 .HasColumnType("character varying")
                 .HasColumnName("cover_encoded");
         });
