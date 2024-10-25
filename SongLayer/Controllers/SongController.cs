@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyMusicApp.Interfaces;
-using MyMusicApp.Model;
+using MyMusicApp.Models;
 
 namespace MyMusicApp.Controllers;
 
@@ -29,6 +30,7 @@ public class SongController : ControllerBase
     [ActionName("create")]
     public async Task<ActionResult> CreateSongAsync(SongCreateModel request)
     {
+        request.UserId = User.FindFirstValue(ClaimTypes.Sid)!;
         await _songService.AddSongAsync(request);
         return Ok("Song created successfully!");
     }
