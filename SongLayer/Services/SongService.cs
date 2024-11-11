@@ -75,6 +75,7 @@ public class SongService : ISongService
     {
         var songToDelete = await _context.Songs.FindAsync(id);
         if (songToDelete != null) _context.Songs.Remove(songToDelete);
+            throw new Exception("Song not found");
     }
 
     public async Task<List<Song>> GetSongsAsync()
@@ -97,5 +98,21 @@ public class SongService : ISongService
     {
         var song = await _context.Songs.FindAsync(id);
         return song ?? throw new Exception("Song not found");
+    }
+
+    public async Task<List<Song>> GetAllPersonal(string userId)
+    {
+        var result = await _context.Songs.Where(s => s.UserId == userId).ToListAsync();
+        foreach (var t in result)
+        {
+            var response = await _httpClient.GetAsync($"http://localhost:5151/auth/getUsernameById?id={t.UserId}");
+            t.UserId = response.IsSuccessStatusCode
+                ? await response.Content.ReadAsStringAsync()
+                : "Unknown";
+            var bytes = await File.ReadAllBytesAsync(t.SongPath);
+            t.SongPath = Convert.ToBase64String(bytes);
+        }
+
+        return result;
     }
 }
