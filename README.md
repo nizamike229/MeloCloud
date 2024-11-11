@@ -1,14 +1,25 @@
-# MyMusicApp
+# 🎶 MyMusicApp
 
-## Описание
-Это пет-проект стримингового сервиса, аналогичного Spotify. В нём реализованы микросервисы с использованием ASP.NET Core, EF Core для работы с данными, Next.js для фронтенда и PostgreSQL в качестве базы данных.
+> Pet project streaming service inspired by Spotify.
 
-## Технологии
-- **ASP.NET Core** - для создания backend API
-- **Entity Framework Core** - для работы с базой данных
-- **Next.js** - для frontend-части
-- **PostgreSQL** - в качестве базы данных
-- **Микросервисы** - для масштабируемости и разделения логики приложения
+### 📋 Description
+This project is a streaming service, designed to mimic features of platforms like Spotify. It uses a microservices architecture, with ASP.NET Core for backend services, EF Core for data handling, Next.js for the frontend, and PostgreSQL as the database.
 
-## Статус проекта
-Проект находится в разработке.
+---
+
+### 💻 Technologies Used
+
+- **ASP.NET Core** - Backend API development
+- **Entity Framework Core** - Database operations
+- **Next.js** - Frontend framework
+- **PostgreSQL** - Database management
+- **Microservices** - For scalability and logical separation of components
+
+---
+
+### 🚧 Project Status
+**In Development**
+
+---
+
+Feel free to contribute or suggest improvements as this project evolves!
