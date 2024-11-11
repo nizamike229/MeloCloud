@@ -15,6 +15,7 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 services.AddDbContext<MusicDbContext>();
 services.AddTransient<ISongService, SongService>();
+services.AddTransient<IPlaylistService, PlaylistService>();
 services.AddHttpClient("AuthClient");
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
