@@ -56,7 +56,7 @@ public class AuthController : ControllerBase
     [ActionName("edit")]
     public async Task<ActionResult<string>> Edit(EditModel request)
     {
-        request.Id=User.FindFirstValue(ClaimTypes.Sid)!;
+        request.Id = User.FindFirstValue(ClaimTypes.Sid)!;
         await _authService.Edit(request);
         return Ok("User edited successfully!");
     }
@@ -64,7 +64,7 @@ public class AuthController : ControllerBase
     [Authorize]
     [HttpGet]
     [ActionName("getUsernameById")]
-    public async Task<ActionResult<string>> GetUsernameById([FromQuery]string id)
+    public async Task<ActionResult<string>> GetUsernameById([FromQuery] string id)
     {
         return Ok(await _authService.GetUsernameByIdAsync(id));
     }
@@ -76,5 +76,14 @@ public class AuthController : ControllerBase
     {
         Response.Cookies.Delete("access_token");
         return Ok();
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ActionName("IsUserExists")]
+    public async Task<ActionResult<bool>> IsUserExists([FromBody] Guid id)
+    {
+        var result = await _authService.IsUserExistAsync(id);
+        return Ok(result);
     }
 }
