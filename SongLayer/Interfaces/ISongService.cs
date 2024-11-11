@@ -9,4 +9,5 @@ public interface ISongService
     Task DeleteSongAsync(int id);
     Task<List<Song>> GetSongsAsync();
     Task<Song> GetSongById(int id);
+    Task<List<Song>> GetAllPersonal(string userId);
 }

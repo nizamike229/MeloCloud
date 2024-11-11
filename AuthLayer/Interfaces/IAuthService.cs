@@ -8,5 +8,6 @@ public interface IAuthService
     Task<User> RegisterAsync(UserLoginRequest request);
     Task Edit(EditModel request);
     Task<UserResponse> GetPersonalInfoAsync(string id);
+    Task<bool> IsUserExistAsync(Guid id);
     Task<string> GetUsernameByIdAsync(string id);
 }
