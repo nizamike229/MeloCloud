@@ -1,12 +1,19 @@
-﻿namespace MyMusicApp.Models;
+﻿using System.Text.Json.Serialization;
 
-public partial class Song
+namespace MyMusicApp.Models;
+
+public sealed class Song
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
 
-    public string SongPath { get; set; } = null!;
-    public string UserId { get; set; }
-    public string CoverEncoded { get; set; } = null!;
+    public required string SongPath { get; set; }
+
+    public required string CoverEncoded { get; set; }
+
+    public string? UserId { get; set; }
+
+    [JsonIgnore]
+    public ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
 }
