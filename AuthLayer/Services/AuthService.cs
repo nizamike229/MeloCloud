@@ -63,17 +63,26 @@ public class AuthService : IAuthService
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(id));
 
-        return user == null ? throw new Exception("Invalid user id") : new UserResponse
-        {
-            Username = user.Username,
-            Logo = user.Logo
-        };
+        return user == null
+            ? throw new Exception("Invalid user id")
+            : new UserResponse
+            {
+                Username = user.Username,
+                Logo = user.Logo
+            };
     }
 
     public async Task<string> GetUsernameByIdAsync(string id)
     {
-        var result= (await _context.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(id)))!.Username;
+        var result = (await _context.Users.FirstOrDefaultAsync(u => u.Id == Guid.Parse(id)))!.Username;
         return result;
+    }
+
+    public async Task<bool> IsUserExistAsync(Guid id)
+    {
+        var result = await _context.Users.FirstOrDefaultAsync(u => u.Id == id) != null;
+        if (result) return true;
+        throw new Exception("User not found");
     }
 
     private string HashPassword(string password)
