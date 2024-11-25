@@ -1,16 +1,16 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
-WORKDIR /src
+WORKDIR /app
 
 COPY ./MyMusicApp.sln ./
 COPY ./AuthLayer/AuthLayer.csproj ./AuthLayer/
 COPY ./SongLayer/SongLayer.csproj ./SongLayer/
 
-RUN dotnet restore MyMusicApp.sln
+RUN dotnet restore
 
-RUN dotnet build ./AuthLayer/AuthLayer.csproj -c Release -o /app/build
+RUN dotnet build -c Release -o /app/build
 
-RUN dotnet publish ./AuthLayer/AuthLayer.csproj -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
