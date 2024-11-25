@@ -11,8 +11,8 @@ services:
 
   auth-layer:
     build:
-      context: ./AuthLayer
-      dockerfile: Dockerfile
+      context: ./ 
+      dockerfile: AuthLayer/Dockerfile
     ports:
       - "5151:8080"
     environment:
@@ -24,8 +24,8 @@ services:
 
   song-layer:
     build:
-      context: ./SongLayer
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: SongLayer/Dockerfile
     ports:
       - "5555:8080"
     environment:
