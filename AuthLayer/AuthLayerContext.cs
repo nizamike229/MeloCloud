@@ -17,7 +17,7 @@ public partial class AuthLayerContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=auth_layer;Username=postgres;Password=password");
+        => optionsBuilder.UseNpgsql("Host=postgres-db;Port=5432;Database=auth_layer;Username=postgres;Password=password");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

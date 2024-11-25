@@ -19,7 +19,7 @@ public partial class MusicDbContext : DbContext
     public virtual DbSet<Song> Songs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=music_db;Username=postgres;Password=password");
+        => optionsBuilder.UseNpgsql("Host=postgres-db;Port=5432;Database=music_db;Username=postgres;Password=password");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
