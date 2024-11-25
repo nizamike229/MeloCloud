@@ -24,7 +24,7 @@ public class SongService : ISongService
 
         if (_httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue("access_token", out var token) == true)
         {
-            cookieContainer.Add(new Uri("http://localhost:5151"), new Cookie("access_token", token));
+            cookieContainer.Add(new Uri("http://auth-layer:8080"), new Cookie("access_token", token));
         }
     }
 
@@ -83,7 +83,7 @@ public class SongService : ISongService
         var result = await _context.Songs.ToListAsync();
         foreach (var t in result)
         {
-            var response = await _httpClient.GetAsync($"http://localhost:5151/auth/getUsernameById?id={t.UserId}");
+            var response = await _httpClient.GetAsync($"http://auth-layer:8080/auth/getUsernameById?id={t.UserId}");
             t.UserId = response.IsSuccessStatusCode
                 ? await response.Content.ReadAsStringAsync()
                 : "Unknown";
@@ -105,7 +105,7 @@ public class SongService : ISongService
         var result = await _context.Songs.Where(s => s.UserId == userId).ToListAsync();
         foreach (var t in result)
         {
-            var response = await _httpClient.GetAsync($"http://localhost:5151/auth/getUsernameById?id={t.UserId}");
+            var response = await _httpClient.GetAsync($"http://auth-layer:8080/auth/getUsernameById?id={t.UserId}");
             t.UserId = response.IsSuccessStatusCode
                 ? await response.Content.ReadAsStringAsync()
                 : "Unknown";
