@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyMusicApp;
 using MyMusicApp.Interfaces;
@@ -59,6 +60,11 @@ services.AddAuthentication(options =>
 services.AddAuthorization();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<MusicDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.UseMiddleware<ErrorHandler>();
 
@@ -72,7 +78,7 @@ app.UseHttpsRedirection();
 
 app.UseCors(policy =>
 {
-    policy.WithOrigins("http://localhost:3000", "https://localhost:5000", "http://localhost:5555");
+    policy.WithOrigins("http://localhost:3000", "https://localhost:5000", "http://localhost:5151");
     policy.AllowAnyMethod();
     policy.AllowAnyHeader();
     policy.AllowCredentials();

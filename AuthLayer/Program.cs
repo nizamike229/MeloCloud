@@ -4,6 +4,7 @@ using AuthLayer.Interfaces;
 using AuthLayer.Middleware;
 using AuthLayer.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,6 +58,12 @@ services.AddAuthentication(options =>
 services.AddAuthorization();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuthLayerContext>();
+    dbContext.Database.Migrate();
+}
+
 app.UseMiddleware<ErrorHandler>();
 
 if (app.Environment.IsDevelopment())
