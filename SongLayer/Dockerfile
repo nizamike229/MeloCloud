@@ -1,21 +1,23 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
-COPY ./MyMusicApp.sln ./
-COPY ./AuthLayer/AuthLayer.csproj ./AuthLayer/
-COPY ./SongLayer/SongLayer.csproj ./SongLayer/
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["SongLayer/SongLayer.csproj", "SongLayer/"]
+RUN dotnet restore "SongLayer/SongLayer.csproj"
+COPY . .
+WORKDIR "/src/SongLayer"
+RUN dotnet build "SongLayer.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-RUN dotnet restore
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "SongLayer.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-RUN dotnet build -c Release -o /app/build
-
-RUN dotnet publish -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-
+FROM base AS final
 WORKDIR /app
-
-COPY --from=build /app/publish .
-
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "SongLayer.dll"]
