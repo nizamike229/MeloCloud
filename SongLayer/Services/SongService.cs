@@ -38,6 +38,11 @@ public class SongService : ISongService
                 throw new Exception("Invalid UserId");
 
             var path = $"./Songs/{song.Name}-{song.UserId}.mp3";
+            var directoryPath = Path.Combine("./Songs");
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
             File.Create(path).Close();
             var bytes = Convert.FromBase64String(song.SongEncoded);
             await File.WriteAllBytesAsync(path, bytes);
