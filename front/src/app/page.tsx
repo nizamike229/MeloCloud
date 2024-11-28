@@ -10,7 +10,9 @@ import { ProfileModal } from '@/components/modals/ProfileModal';
 import { Header } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { Player } from '@/components/Player';
-import { Song, UserData } from '@/types';
+import { SongCard } from '@/components/SongCard';
+import { Song, UserData, Playlist } from '@/types';
+import { getErrorMessage } from '@/utils/errorHandler';
 
 export default function Component() {
     const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
@@ -32,6 +34,7 @@ export default function Component() {
     const [personalSongs, setPersonalSongs] = useState<Song[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredSongs, setFilteredSongs] = useState<Song[]>([]);
+    const [playlists, setPlaylists] = useState<Playlist[]>([]);
 
     const fetchSongs = useCallback(async () => {
         try {
@@ -52,6 +55,16 @@ export default function Component() {
         } catch (error) {
             console.error("Error fetching user data:", error);
             redirect('/auth');
+        }
+    }, []);
+
+    const fetchPlaylists = useCallback(async () => {
+        try {
+            const response = await axios.get('/Playlist/getAll');
+            setPlaylists(response.data);
+        } catch (error) {
+            console.error("Error fetching playlists:", error);
+            setPopup({ message: "Failed to fetch playlists", type: "error" });
         }
     }, []);
 
@@ -148,9 +161,9 @@ export default function Component() {
             setPopup({message: "Song created successfully!", type: "success"});
             setIsAddSongModalOpen(false);
             await fetchSongs();
-        } catch (error) {
-            console.error('Error creating song:', error);
-            setPopup({message: "Failed to create song. Please try again.", type: "error"});
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error);
+            setPopup({message: errorMessage, type: "error"});
         }
     };
 
@@ -175,9 +188,9 @@ export default function Component() {
             setPopup({message: "Profile updated successfully", type: "success"});
             setIsEditProfileModalOpen(false);
             await fetchUserData();
-        } catch (error) {
-            console.error('Error updating profile:', error);
-            setPopup({message: "Failed to update profile", type: "error"});
+        } catch (error: any) {
+            const errorMessage = getErrorMessage(error);
+            setPopup({message: errorMessage, type: "error"});
         }
     };
 
@@ -233,10 +246,23 @@ export default function Component() {
         );
     };
 
+    const handleAddToPlaylist = async (songId: string, playlistId: string) => {
+        try {
+            await axios.post('/Playlist/addSongToPlaylist', { songId, playlistId });
+            setPopup({ message: "Song added to playlist successfully!", type: "success" });
+            fetchPlaylists();
+        } catch (error) {
+            console.error("Error adding song to playlist:", error);
+            setPopup({ message: "Failed to add song to playlist", type: "error" });
+        }
+    };
+
     useEffect(() => {
         fetchSongs();
         fetchUserData();
-    }, [fetchSongs, fetchUserData]);
+        fetchPlaylists();
+        fetchPersonalSongs();
+    }, [fetchSongs, fetchUserData, fetchPlaylists, fetchPersonalSongs]);
 
     useEffect(() => {
         if (audioRef.current) {
@@ -302,8 +328,11 @@ export default function Component() {
                 isPlaying={isPlaying}
                 playSong={playSong}
                 handleEditProfile={() => {
-                    setNewUsername(userData.username);
-                    setIsEditProfileModalOpen(true);
+                    setIsProfileModalOpen(false);
+                    setTimeout(() => {
+                        setNewUsername(userData.username);
+                        setIsEditProfileModalOpen(true);
+                    }, 100);
                 }}
                 renderLogo={renderLogo}
             />
@@ -328,33 +357,15 @@ export default function Component() {
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                         {filteredSongs.map((song) => (
-                            <div
+                            <SongCard
                                 key={song.id}
-                                className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition-colors relative group cursor-pointer"
+                                song={song}
+                                currentSong={currentSong}
+                                isPlaying={isPlaying}
                                 onClick={() => handleSongClick(song)}
-                            >
-                                <img
-                                    src={`data:image/jpeg;base64,${song.coverEncoded}`}
-                                    alt={song.name}
-                                    className="w-full aspect-square object-cover rounded-md mb-4"
-                                />
-                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-opacity duration-300 rounded-md flex items-center justify-center">
-                                    <div className="text-white opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                        {currentSong && currentSong.id === song.id && isPlaying ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        ) : (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        )}
-                                    </div>
-                                </div>
-                                <h3 className="font-semibold text-white truncate">{song.name}</h3>
-                                <p className="text-sm text-gray-400 truncate">{song.userId}</p>
-                            </div>
+                                playlists={playlists}
+                                onAddToPlaylist={handleAddToPlaylist}
+                            />
                         ))}
                     </div>
                 </main>
