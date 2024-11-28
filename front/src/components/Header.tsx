@@ -58,24 +58,36 @@ export const Header: React.FC<HeaderProps> = ({
                         <Button variant="ghost" className="h-8 w-8 p-0">
                             <span className="sr-only">Open menu</span>
                             <Avatar className="h-14 w-14 border-white border-2 rounded-md">
-                                {userData.logo ? (
+                                {userData?.logo ? (
                                     renderLogo(userData.logo, 'small')
                                 ) : (
-                                    <AvatarFallback>{userData.username ? userData.username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+                                    <AvatarFallback>{userData?.username ? userData.username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
                                 )}
                             </Avatar>
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-56" align="end" forceMount>
+                    <PopoverContent 
+                        className="w-56 p-4 bg-gray-800 border border-gray-700 shadow-lg" 
+                        align="end" 
+                        sideOffset={5}
+                    >
                         <div className="grid gap-4">
-                            <div className="font-medium">{userData.username}</div>
-                            <Button variant="outline" onClick={() => {
-                                setIsProfileModalOpen(true);
-                                fetchPersonalSongs();
-                            }}>
+                            <div className="font-medium text-gray-200">{userData?.username}</div>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => {
+                                    setIsProfileModalOpen(true);
+                                    fetchPersonalSongs();
+                                }}
+                                className="bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600 hover:text-white"
+                            >
                                 Profile
                             </Button>
-                            <Button variant="outline" onClick={handleLogout}>
+                            <Button 
+                                variant="outline" 
+                                onClick={handleLogout}
+                                className="bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600 hover:text-white"
+                            >
                                 Logout
                             </Button>
                         </div>
