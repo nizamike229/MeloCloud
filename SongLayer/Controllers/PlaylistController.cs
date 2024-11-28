@@ -27,7 +27,7 @@ public class PlaylistController : ControllerBase
 
     [HttpPost]
     [ActionName("create")]
-    public async Task<ActionResult<string>> CreatePlaylistAsync(PlaylistCreateModel playlist)
+    public async Task<ActionResult<string>> CreatePlaylistAsync([FromBody] PlaylistCreateModel playlist)
     {
         playlist.UserId = User.FindFirstValue(ClaimTypes.Sid)!;
         await _service.CreatePlaylistAsync(playlist);
