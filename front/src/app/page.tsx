@@ -13,6 +13,8 @@ import { Player } from '@/components/Player';
 import { SongCard } from '@/components/SongCard';
 import { Song, UserData, Playlist } from '@/types';
 import { getErrorMessage } from '@/utils/errorHandler';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { Loader } from '@/components/Loader';
 
 export default function Component() {
     const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
@@ -35,14 +37,18 @@ export default function Component() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredSongs, setFilteredSongs] = useState<Song[]>([]);
     const [playlists, setPlaylists] = useState<Playlist[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const fetchSongs = useCallback(async () => {
         try {
+            setIsLoading(true);
             const response = await axios.get("/Song/All");
             setSongs(response.data);
             setFilteredSongs(response.data);
         } catch (error) {
             redirect('/auth');
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 
@@ -296,6 +302,30 @@ export default function Component() {
         }
     }, [searchTerm, songs, handleSearch]);
 
+    useKeyboardShortcuts({
+        space: () => {
+            if (currentSong) {
+                togglePlayPause();
+            }
+        },
+        arrowLeft: () => {
+            if (currentSong) {
+                playPreviousSong();
+            }
+        },
+        arrowRight: () => {
+            if (currentSong) {
+                playNextSong();
+            }
+        },
+        ctrl_f: () => {
+            const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }
+    });
+
     return (
         <div className="flex h-screen bg-gray-900 text-gray-200">
             {popup && <Popup message={popup.message} type={popup.type} onClose={() => setPopup(null)} />}
@@ -355,19 +385,23 @@ export default function Component() {
                     <h2 className="text-2xl font-bold mb-6 text-white">
                         {searchTerm ? 'Search Results' : 'Featured Songs'}
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                        {filteredSongs.map((song) => (
-                            <SongCard
-                                key={song.id}
-                                song={song}
-                                currentSong={currentSong}
-                                isPlaying={isPlaying}
-                                onClick={() => handleSongClick(song)}
-                                playlists={playlists}
-                                onAddToPlaylist={handleAddToPlaylist}
-                            />
-                        ))}
-                    </div>
+                    {isLoading ? (
+                        <Loader />
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                            {filteredSongs.map((song) => (
+                                <SongCard
+                                    key={song.id}
+                                    song={song}
+                                    currentSong={currentSong}
+                                    isPlaying={isPlaying}
+                                    onClick={() => handleSongClick(song)}
+                                    playlists={playlists}
+                                    onAddToPlaylist={handleAddToPlaylist}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </main>
 
                 {currentSong && (

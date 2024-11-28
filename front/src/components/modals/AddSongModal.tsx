@@ -1,14 +1,14 @@
-import React from 'react';
-import { FileInput } from '../FileInput';
+import React, { useState } from 'react';
+import { Button } from '../ui/button';
 
 interface AddSongModalProps {
-    isOpen: boolean
-    onClose: () => void
-    songName: string
-    setSongName: (name: string) => void
-    handleSongFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-    handleCoverFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-    handleCreateSong: () => void
+    isOpen: boolean;
+    onClose: () => void;
+    songName: string;
+    setSongName: (name: string) => void;
+    handleSongFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleCoverFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleCreateSong: () => void;
 }
 
 export const AddSongModal: React.FC<AddSongModalProps> = ({
@@ -20,34 +20,84 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
     handleCoverFileChange,
     handleCreateSong
 }) => {
+    const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+    const handleCoverPreview = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setCoverPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+        handleCoverFileChange(e);
+    };
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9998]">
-            <div className="bg-[#282828] p-6 rounded-lg shadow-lg w-96 max-w-full transform transition-all duration-300 ease-in-out scale-100 opacity-100 animate-modal-open">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-white">Create Song</h2>
-                    <button onClick={onClose} className="text-[#b3b3b3] hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+                <h2 className="text-2xl font-bold text-white mb-4">Create Song</h2>
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-[#b3b3b3]">Song Name</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Song Name</label>
                     <input
                         type="text"
                         value={songName}
                         onChange={(e) => setSongName(e.target.value)}
-                        className="w-full px-3 py-2 text-white bg-[#3e3e3e] border border-[#727272] rounded-md focus:outline-none focus:ring-2 focus:ring-[#1db954]"
+                        placeholder="Enter song name"
+                        className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-                <FileInput label="Song File (MP3)" accept="audio/mp3" onChange={handleSongFileChange} />
-                <FileInput label="Cover Image" accept="image/*" onChange={handleCoverFileChange} isImage={true} />
-                <div className="flex justify-end space-x-4">
-                    <button onClick={handleCreateSong} className="px-4 py-2 text-sm font-medium text-white bg-[#1db954] rounded-md hover:bg-[#1ed760] transition-colors">
+
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Song File (MP3)</label>
+                    <input
+                        type="file"
+                        onChange={handleSongFileChange}
+                        accept="audio/mp3"
+                        className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Cover Image</label>
+                    <div className="space-y-4">
+                        <input
+                            type="file"
+                            onChange={handleCoverPreview}
+                            accept="image/*"
+                            className="w-full px-3 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                        />
+                        {coverPreview && (
+                            <div className="mt-2 flex justify-center">
+                                <img 
+                                    src={coverPreview} 
+                                    alt="Cover preview" 
+                                    className="max-w-full rounded-md"
+                                    style={{ maxHeight: '400px' }}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                    <Button 
+                        onClick={onClose} 
+                        variant="outline" 
+                        className="bg-gray-700 text-white border-gray-600 hover:bg-gray-600"
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleCreateSong}
+                        className="bg-blue-600 hover:bg-blue-700"
+                        disabled={!songName.trim()}
+                    >
                         Create
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
