@@ -25,13 +25,13 @@ public class PlaylistService : IPlaylistService
 
         if (_httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue("access_token", out var token) == true)
         {
-            cookieContainer.Add(new Uri("http://localhost:5151"), new Cookie("access_token", token));
+            cookieContainer.Add(new Uri("http://auth-layer:8080"), new Cookie("access_token", token));
         }
     }
 
     public async Task CreatePlaylistAsync(PlaylistCreateModel request)
     {
-        var response = _httpClient.PostAsync("http://localhost:5151/auth/isUserExists",
+        var response = _httpClient.PostAsync("http://auth-layer:8080/auth/isUserExists",
             new StringContent($"userId={request.Name}", Encoding.UTF8, "application/json")).Result;
         var responseString = await response.Content.ReadAsStringAsync();
         if (responseString == "false")
@@ -66,14 +66,14 @@ public class PlaylistService : IPlaylistService
         var result = await _context.Playlists.Include(playlist => playlist.Songs).ToListAsync();
         foreach (var t in result)
         {
-            var response = await _httpClient.GetAsync($"http://localhost:5151/auth/getUsernameById?id={t.UserId}");
+            var response = await _httpClient.GetAsync($"http://auth-layer:8080/auth/getUsernameById?id={t.UserId}");
             t.UserId = response.IsSuccessStatusCode
                 ? await response.Content.ReadAsStringAsync()
                 : "Unknown";
             foreach (var s in t.Songs)
             {
                 var songResponse =
-                    await _httpClient.GetAsync($"http://localhost:5151/auth/getUsernameById?id={s.UserId}");
+                    await _httpClient.GetAsync($"http://auth-layer:8080/auth/getUsernameById?id={s.UserId}");
                 s.UserId = response.IsSuccessStatusCode
                     ? await songResponse.Content.ReadAsStringAsync()
                     : "Unknown";
