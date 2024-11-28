@@ -4,6 +4,7 @@ import {useState} from 'react'
 import {useRouter} from 'next/navigation'
 import myDefault from 'axios'
 import {motion, AnimatePresence} from 'framer-motion'
+import { getErrorMessage } from '@/utils/errorHandler';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true)
@@ -37,8 +38,8 @@ export default function AuthPage() {
                 }
             }
         } catch (err: any) {
-            const errorMessage = err.response?.data || err.message || 'An error occurred'
-            setError(typeof errorMessage === 'string' ? errorMessage : 'An unexpected error occurred')
+            const errorMessage = getErrorMessage(err)
+            setError(errorMessage)
         }
     }
 
