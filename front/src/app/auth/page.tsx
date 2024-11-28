@@ -35,11 +35,10 @@ export default function AuthPage() {
                 } else {
                     setTimeout(() => setIsLogin(true), 1500)
                 }
-            } else {
-                setError(response.data.message || 'An error occurred')
             }
-        } catch (err) {
-            setError('An error occurred. Please try again.')
+        } catch (err: any) {
+            const errorMessage = err.response?.data || err.message || 'An error occurred'
+            setError(typeof errorMessage === 'string' ? errorMessage : 'An unexpected error occurred')
         }
     }
 
@@ -50,23 +49,23 @@ export default function AuthPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="min-h-screen flex items-center justify-center bg-gray-900">
             <motion.div
                 initial={{opacity: 0, y: -20}}
                 animate={{opacity: 1, y: 0}}
                 transition={{duration: 0.5}}
                 className="w-full max-w-md"
             >
-                <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                    <h2 className="text-2xl font-bold mb-6 text-center text-black">
+                <form onSubmit={handleSubmit} className="bg-gray-800 shadow-xl rounded-lg px-8 pt-6 pb-8 mb-4">
+                    <h2 className="text-2xl font-bold mb-6 text-center text-white">
                         {isLogin ? 'Login' : 'Register'}
                     </h2>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="username">
                             Username
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-700 text-white border-gray-600 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             id="username"
                             type="text"
                             placeholder="Username"
@@ -76,11 +75,11 @@ export default function AuthPage() {
                         />
                     </div>
                     <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                        <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="password">
                             Password
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 bg-gray-700 text-white border-gray-600 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             id="password"
                             type="password"
                             placeholder="******************"
@@ -93,7 +92,7 @@ export default function AuthPage() {
                         <motion.button
                             whileHover={{scale: 1.05}}
                             whileTap={{scale: 0.95}}
-                            className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200"
                             type="submit"
                         >
                             {isLogin ? 'Sign In' : 'Sign Up'}
@@ -101,7 +100,7 @@ export default function AuthPage() {
                         <motion.button
                             whileHover={{scale: 1.05}}
                             whileTap={{scale: 0.95}}
-                            className="inline-block align-baseline font-bold text-sm text-black hover:text-gray-800"
+                            className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-400 transition-colors duration-200"
                             type="button"
                             onClick={toggleAuthMode}
                         >
@@ -111,24 +110,24 @@ export default function AuthPage() {
                 </form>
                 <AnimatePresence>
                     {error && (
-                        <motion.p
+                        <motion.div
                             initial={{opacity: 0, y: -10}}
                             animate={{opacity: 1, y: 0}}
                             exit={{opacity: 0, y: -10}}
-                            className="text-red-500 text-xs italic mt-2"
+                            className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md"
                         >
                             {error}
-                        </motion.p>
+                        </motion.div>
                     )}
                     {success && (
-                        <motion.p
+                        <motion.div
                             initial={{opacity: 0, y: -10}}
                             animate={{opacity: 1, y: 0}}
                             exit={{opacity: 0, y: -10}}
-                            className="text-green-500 text-xs italic mt-2"
+                            className="bg-green-500 text-white px-4 py-2 rounded-md shadow-md"
                         >
                             {success}
-                        </motion.p>
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </motion.div>
