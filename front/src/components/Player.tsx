@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button"
 import { Song } from '@/types';
+import { Equalizer } from './Equalizer';
 
 interface PlayerProps {
     currentSong: Song
@@ -34,7 +35,10 @@ export const Player: React.FC<PlayerProps> = ({
                     className="w-20 h-20 object-cover rounded-md mr-4"
                 />
                 <div className="flex-1">
-                    <h3 className="font-bold text-white text-lg">{currentSong.name}</h3>
+                    <div className="flex items-center">
+                        <h3 className="font-bold text-white text-lg mr-3">{currentSong.name}</h3>
+                        <Equalizer isPlaying={isPlaying} />
+                    </div>
                     <p className="text-sm text-gray-400">{currentSong.userId}</p>
                 </div>
                 <div className="flex items-center space-x-8">
