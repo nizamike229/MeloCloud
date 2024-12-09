@@ -18,6 +18,9 @@ export default function PlaylistsPage() {
     const [currentSong, setCurrentSong] = useState<Song | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isAddSongModalOpen, setIsAddSongModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const fetchPlaylists = async () => {
         try {
@@ -64,6 +67,22 @@ export default function PlaylistsPage() {
         }
     };
 
+    const handleSearch = (term: string) => {
+        setSearchTerm(term);
+    };
+
+    const handleLogout = () => {
+        // Реализация выхода
+    };
+
+    const fetchPersonalSongs = () => {
+        // Реализация получения песен
+    };
+
+    const renderLogo = (logo: string, size: 'small' | 'large') => {
+        return <img src={logo} alt="logo" className={size === 'small' ? 'w-8 h-8' : 'w-12 h-12'} />;
+    };
+
     useEffect(() => {
         fetchPlaylists();
     }, []);
@@ -91,7 +110,16 @@ export default function PlaylistsPage() {
             <Sidebar />
 
             <div className="flex-1 flex flex-col overflow-hidden">
-                <Header />
+                <Header 
+                    searchTerm={searchTerm}
+                    handleSearch={handleSearch}
+                    setIsAddSongModalOpen={setIsAddSongModalOpen}
+                    setIsProfileModalOpen={setIsProfileModalOpen}
+                    fetchPersonalSongs={fetchPersonalSongs}
+                    handleLogout={handleLogout}
+                    userData={{username:"user", logo:"logo"}}
+                    renderLogo={renderLogo}
+                />
                 <Playlists
                     playlists={playlists}
                     onPlaySong={handlePlaySong}
