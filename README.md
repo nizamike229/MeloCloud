@@ -61,7 +61,7 @@ MeloCloud is a full-stack music streaming platform inspired by Spotify, featurin
 - Node.js (v16+)
 - .NET 8.0 SDK
 - PostgreSQL
-- Docker (optional)
+- Docker
 
 ### Installation
 
@@ -77,15 +77,6 @@ cd melocloud
 3. Using Docker:
 ```bash
 docker-compose up --build
-```
-
-4. Manual Setup:
-
-Frontend:
-```bash
-cd front
-npm install
-npm run dev
 ```
 
 Access the application:
