@@ -69,7 +69,8 @@ MeloCloud is a full-stack music streaming platform inspired by Spotify, featurin
 ```bash
 git clone https://github.com/nizamike229/MeloCloud
 ```
-2.Go to project directory
+
+2. Go to project directory
 ```bash
 cd melocloud
 ```
