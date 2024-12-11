@@ -69,13 +69,16 @@ MeloCloud is a full-stack music streaming platform inspired by Spotify, featurin
 ```bash
 git clone https://github.com/nizamike229/MeloCloud
 ```
-
-2. Using Docker:
+2.Go to project directory
+```bash
+cd melocloud
+```
+3. Using Docker:
 ```bash
 docker-compose up --build
 ```
 
-3. Manual Setup:
+4. Manual Setup:
 
 Frontend:
 ```bash
